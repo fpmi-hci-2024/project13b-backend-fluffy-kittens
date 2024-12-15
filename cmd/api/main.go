@@ -6,6 +6,7 @@ import (
 
 	"fluffy-shop-api/internal/handlers"
 	"fluffy-shop-api/internal/services"
+	"fluffy-shop-api/internal/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -20,6 +21,7 @@ func main() {
 	customerHandler := handlers.NewCustomerHandler(db)
 
 	r := mux.NewRouter()
+	r.Use(utils.EnableCORS)
 
 	// Product routes
 	r.HandleFunc("/products", productHandler.GetProducts).Methods("GET")
