@@ -19,6 +19,8 @@ func main() {
 	productHandler := handlers.NewProductHandler(db)
 	orderHandler := handlers.NewOrderHandler(db)
 	customerHandler := handlers.NewCustomerHandler(db)
+	cartHandler := handlers.NewCartHandler(db)           // Initialize CartHandler
+	favoritesHandler := handlers.NewFavoritesHandler(db) // Initialize FavoritesHandler
 
 	r := mux.NewRouter()
 	r.Use(utils.EnableCORS)
@@ -31,18 +33,34 @@ func main() {
 	r.HandleFunc("/products/{productId}", productHandler.DeleteProduct).Methods("DELETE")
 
 	// Order routes
-	r.HandleFunc("/orders", orderHandler.GetOrders).Methods("GET")
 	r.HandleFunc("/orders", orderHandler.CreateOrder).Methods("POST")
 	r.HandleFunc("/orders/{orderId}", orderHandler.GetOrder).Methods("GET")
 	r.HandleFunc("/orders/{orderId}", orderHandler.UpdateOrder).Methods("PUT")
 	r.HandleFunc("/orders/{orderId}", orderHandler.DeleteOrder).Methods("DELETE")
 
 	// Customer routes
-	r.HandleFunc("/customers", customerHandler.GetCustomers).Methods("GET")
 	r.HandleFunc("/customers", customerHandler.CreateCustomer).Methods("POST")
 	r.HandleFunc("/customers/{customerId}", customerHandler.GetCustomer).Methods("GET")
 	r.HandleFunc("/customers/{customerId}", customerHandler.UpdateCustomer).Methods("PUT")
 	r.HandleFunc("/customers/{customerId}", customerHandler.DeleteCustomer).Methods("DELETE")
+
+	// Cart routes
+	r.HandleFunc("/carts", cartHandler.GetCarts).Methods("GET")
+	r.HandleFunc("/carts", cartHandler.CreateCart).Methods("POST")
+	r.HandleFunc("/carts/{cartId}", cartHandler.GetCart).Methods("GET")
+	r.HandleFunc("/carts/{cartId}", cartHandler.UpdateCart).Methods("PUT")
+	r.HandleFunc("/carts/{cartId}", cartHandler.DeleteCart).Methods("DELETE")
+	r.HandleFunc("/carts/{cartId}/products/{productId}", cartHandler.AddProductToCart).Methods("POST")
+	r.HandleFunc("/carts/{cartId}/products/{productId}", cartHandler.RemoveProductFromCart).Methods("DELETE")
+
+	// Favorites routes
+	r.HandleFunc("/favorites", favoritesHandler.GetFavorites).Methods("GET")
+	r.HandleFunc("/favorites", favoritesHandler.CreateFavorites).Methods("POST")
+	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.GetFavoritesByID).Methods("GET")
+	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.UpdateFavorites).Methods("PUT")
+	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.DeleteFavorites).Methods("DELETE")
+	r.HandleFunc("/favorites/{favoriteId}/products/{productId}", favoritesHandler.AddProductToFavorites).Methods("POST")
+	r.HandleFunc("/favorites/{favoriteId}/products/{productId}", favoritesHandler.RemoveProductFromFavorites).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

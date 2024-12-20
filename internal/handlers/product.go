@@ -11,15 +11,15 @@ import (
 )
 
 type ProductHandler struct {
-	db services.Database
+	db services.ProductDB
 }
 
-func NewProductHandler(db services.Database) *ProductHandler {
+func NewProductHandler(db services.ProductDB) *ProductHandler {
 	return &ProductHandler{db: db}
 }
 
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	products, err := h.db.GetProducts()
+	products, err := h.db.GetAllProducts()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -46,7 +46,7 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	productID := vars["productId"]
-	product, err := h.db.GetProduct(productID)
+	product, err := h.db.GetProductByID(productID)
 	if err != nil {
 		http.Error(w, "Product not found", http.StatusNotFound)
 		return
