@@ -18,7 +18,7 @@ type ProductDB interface {
 	GetProductByID(id string) (models.Product, error)
 	UpdateProduct(product models.Product) error
 	DeleteProduct(id string) error
-	GetAllProducts() ([]models.Product, error)
+	GetAllProducts() (map[string]models.Product, error)
 }
 
 // OrderDB defines database operations for Order model

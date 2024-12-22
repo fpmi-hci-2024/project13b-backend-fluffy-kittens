@@ -157,12 +157,8 @@ func (m *MockDatabase) DeleteProduct(id string) error {
 	return nil
 }
 
-func (m *MockDatabase) GetAllProducts() ([]models.Product, error) {
-	var products []models.Product
-	for _, product := range m.Products {
-		products = append(products, product)
-	}
-	return products, nil
+func (m *MockDatabase) GetAllProducts() (map[string]models.Product, error) {
+	return m.Products, nil
 }
 
 // Implement CustomerDB interface

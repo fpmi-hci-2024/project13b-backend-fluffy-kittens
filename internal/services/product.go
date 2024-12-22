@@ -74,7 +74,7 @@ func (pdb *PostgresDatabase) DeleteProduct(id string) error {
 	return nil
 }
 
-func (pdb *PostgresDatabase) GetAllProducts() ([]models.Product, error) {
+func (pdb *PostgresDatabase) GetAllProducts() (map[string]models.Product, error) {
 	query := `
         SELECT id, name, description, price, stock
         FROM products
@@ -85,13 +85,14 @@ func (pdb *PostgresDatabase) GetAllProducts() ([]models.Product, error) {
 	}
 	defer rows.Close()
 
-	var products []models.Product
+	products := make(map[string]models.Product)
+
 	for rows.Next() {
 		var product models.Product
 		if err := rows.Scan(&product.ID, &product.Name, &product.Description, &product.Price, &product.Stock); err != nil {
 			return nil, fmt.Errorf("failed to scan product: %w", err)
 		}
-		products = append(products, product)
+		products[product.ID] = product
 	}
 
 	if err := rows.Err(); err != nil {
