@@ -13,7 +13,11 @@ import (
 
 func main() {
 	// Initialize the database (for production, use the actual database connection)
-	db := services.NewMockDatabase()
+	db, err := services.NewPostgresDatabase("postgresql://fluffy_kitten:htUtmkIjKHoQuwO6cDcbvsNsQZzXuYb7@dpg-ct7mmg56l47c73crse90-a/fluffy_db")
+
+	if err != nil {
+		log.Fatal("Could not initialize db connection")
+	}
 
 	// Initialize handlers with the database instance
 	productHandler := handlers.NewProductHandler(db)
@@ -37,6 +41,8 @@ func main() {
 	r.HandleFunc("/orders/{orderId}", orderHandler.GetOrder).Methods("GET")
 	r.HandleFunc("/orders/{orderId}", orderHandler.UpdateOrder).Methods("PUT")
 	r.HandleFunc("/orders/{orderId}", orderHandler.DeleteOrder).Methods("DELETE")
+	r.HandleFunc("/orders/{orderId}/products/{productId}", orderHandler.AddProductToOrder).Methods("POST")
+	r.HandleFunc("/orders/{orderId}/products/{productId}", orderHandler.RemoveProductFromOrder).Methods("DELETE")
 
 	// Customer routes
 	r.HandleFunc("/customers", customerHandler.CreateCustomer).Methods("POST")
@@ -45,7 +51,6 @@ func main() {
 	r.HandleFunc("/customers/{customerId}", customerHandler.DeleteCustomer).Methods("DELETE")
 
 	// Cart routes
-	r.HandleFunc("/carts", cartHandler.GetCarts).Methods("GET")
 	r.HandleFunc("/carts", cartHandler.CreateCart).Methods("POST")
 	r.HandleFunc("/carts/{cartId}", cartHandler.GetCart).Methods("GET")
 	r.HandleFunc("/carts/{cartId}", cartHandler.UpdateCart).Methods("PUT")
@@ -54,7 +59,6 @@ func main() {
 	r.HandleFunc("/carts/{cartId}/products/{productId}", cartHandler.RemoveProductFromCart).Methods("DELETE")
 
 	// Favorites routes
-	r.HandleFunc("/favorites", favoritesHandler.GetFavorites).Methods("GET")
 	r.HandleFunc("/favorites", favoritesHandler.CreateFavorites).Methods("POST")
 	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.GetFavoritesByID).Methods("GET")
 	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.UpdateFavorites).Methods("PUT")

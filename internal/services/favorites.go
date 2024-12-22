@@ -73,3 +73,34 @@ func (pdb *PostgresDatabase) DeleteFavorites(id string) error {
 	}
 	return nil
 }
+
+func (pdb *PostgresDatabase) AddProductToFavorites(favoriteID string, productID string) error {
+	query := `
+        INSERT INTO favorites_products (favorite_id, product_id)
+        VALUES ($1, $2)
+    `
+	_, err := pdb.db.Exec(query, favoriteID, productID)
+	if err != nil {
+		return fmt.Errorf("failed to add product to favorites: %w", err)
+	}
+	return nil
+}
+
+func (pdb *PostgresDatabase) RemoveProductFromFavorites(favoriteID string, productID string) error {
+	query := `
+        DELETE FROM favorites_products
+        WHERE favorite_id = $1 AND product_id = $2
+    `
+	result, err := pdb.db.Exec(query, favoriteID, productID)
+	if err != nil {
+		return fmt.Errorf("failed to remove product from favorites: %w", err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("product with ID %s not found in favorites with ID %s", productID, favoriteID)
+	}
+	return nil
+}

@@ -73,3 +73,54 @@ func (h *OrderHandler) DeleteOrder(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (h *OrderHandler) AddProductToOrder(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	orderID := vars["orderId"]
+	productID := vars["productId"]
+
+	// Check if the order exists
+	_, err := h.db.GetOrderByID(orderID)
+	if err != nil {
+		http.Error(w, "Order not found", http.StatusNotFound)
+		return
+	}
+
+	// Check if the product exists (you can add this check if needed)
+	// _, err = h.db.GetProductByID(productID)
+	// if err != nil {
+	// 	http.Error(w, "Product not found", http.StatusNotFound)
+	// 	return
+	// }
+
+	// Add the product to the order
+	err = h.db.AddProductToOrder(orderID, productID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *OrderHandler) RemoveProductFromOrder(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	orderID := vars["orderId"]
+	productID := vars["productId"]
+
+	// Check if the order exists
+	_, err := h.db.GetOrderByID(orderID)
+	if err != nil {
+		http.Error(w, "Order not found", http.StatusNotFound)
+		return
+	}
+
+	// Remove the product from the order
+	err = h.db.RemoveProductFromOrder(orderID, productID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}

@@ -18,10 +18,6 @@ func NewCartHandler(db services.CartDB) *CartHandler {
 	return &CartHandler{db: db}
 }
 
-func (h *CartHandler) GetCarts(w http.ResponseWriter, r *http.Request) {
-	// Implement logic to get all carts
-}
-
 func (h *CartHandler) CreateCart(w http.ResponseWriter, r *http.Request) {
 	var cart models.Cart
 	if err := json.NewDecoder(r.Body).Decode(&cart); err != nil {
