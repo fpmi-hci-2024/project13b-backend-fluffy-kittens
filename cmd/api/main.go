@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -16,7 +17,7 @@ func main() {
 	db, err := services.NewPostgresDatabase("postgresql://fluffy_kitten:htUtmkIjKHoQuwO6cDcbvsNsQZzXuYb7@dpg-ct7mmg56l47c73crse90-a/fluffy_db")
 
 	if err != nil {
-		log.Fatal("Could not initialize db connection")
+		log.Fatal(fmt.Printf("Could not initialize db connection: %s", err))
 	}
 
 	// Initialize handlers with the database instance
