@@ -7,10 +7,8 @@ import (
 // EnableCORS is a middleware function to handle CORS headers
 func EnableCORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers for requests from https://project13b-web-fluffy-kittens.onrender.com
+		// Set CORS headers for requests from specific origins
 		origin := r.Header.Get("Origin")
-
-		// Allow requests from specific origins
 		if origin == "https://project13b-web-fluffy-kittens.onrender.com" || origin == "http://localhost:4200" {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -20,7 +18,7 @@ func EnableCORS(next http.Handler) http.Handler {
 
 		// Handle preflight OPTIONS requests
 		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent) // Use 204 No Content for OPTIONS
 			return
 		}
 
