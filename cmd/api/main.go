@@ -30,6 +30,11 @@ func main() {
 	r := mux.NewRouter()
 	r.Use(utils.EnableCORS)
 
+	// Global OPTIONS handler for preflight requests
+	r.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	})
+
 	// Product routes
 	r.HandleFunc("/products", productHandler.GetProducts).Methods("GET")
 	r.HandleFunc("/products", productHandler.CreateProduct).Methods("POST")
