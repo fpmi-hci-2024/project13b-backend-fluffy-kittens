@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"fluffy-shop-api/internal/models"
 	"fluffy-shop-api/internal/services"
 
 	"github.com/gorilla/mux"
@@ -18,27 +17,11 @@ func NewFavoritesHandler(db services.FavoritesDB) *FavoritesHandler {
 	return &FavoritesHandler{db: db}
 }
 
-func (h *FavoritesHandler) GetFavorites(w http.ResponseWriter, r *http.Request) {
-	// Implement logic to get all favorites
-}
-
-func (h *FavoritesHandler) CreateFavorites(w http.ResponseWriter, r *http.Request) {
-	var favorites models.Favorites
-	if err := json.NewDecoder(r.Body).Decode(&favorites); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if err := h.db.CreateFavorites(favorites); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusCreated)
-}
-
-func (h *FavoritesHandler) GetFavoritesByID(w http.ResponseWriter, r *http.Request) {
+// GetFavoritesByUserID retrieves the favorites for a specific user.
+func (h *FavoritesHandler) GetFavoritesByUserID(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	favoriteID := params["favoriteId"]
-	favorites, err := h.db.GetFavoritesByID(favoriteID)
+	customerID := params["customerId"]
+	favorites, err := h.db.GetFavoritesByUserID(customerID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -46,45 +29,24 @@ func (h *FavoritesHandler) GetFavoritesByID(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(favorites)
 }
 
-func (h *FavoritesHandler) UpdateFavorites(w http.ResponseWriter, r *http.Request) {
-	var favorites models.Favorites
-	if err := json.NewDecoder(r.Body).Decode(&favorites); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if err := h.db.UpdateFavorites(favorites); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-}
-
-func (h *FavoritesHandler) DeleteFavorites(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	favoriteID := params["favoriteId"]
-	if err := h.db.DeleteFavorites(favoriteID); err != nil {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
-
+// AddProductToFavorites adds a product to the user's favorites.
 func (h *FavoritesHandler) AddProductToFavorites(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	favoriteID := params["favoriteId"]
+	customerID := params["customerId"]
 	productID := params["productId"]
-	if err := h.db.AddProductToFavorites(favoriteID, productID); err != nil {
+	if err := h.db.AddProductToFavorites(customerID, productID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 }
 
+// RemoveProductFromFavorites removes a product from the user's favorites.
 func (h *FavoritesHandler) RemoveProductFromFavorites(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	favoriteID := params["favoriteId"]
+	customerID := params["customerId"]
 	productID := params["productId"]
-	if err := h.db.RemoveProductFromFavorites(favoriteID, productID); err != nil {
+	if err := h.db.RemoveProductFromFavorites(customerID, productID); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

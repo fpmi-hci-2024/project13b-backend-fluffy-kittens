@@ -96,13 +96,11 @@ func NewMockDatabase() *MockDatabase {
 
 	// Add sample carts
 	db.Carts = map[string]models.Cart{
-		"cart1": {
-			ID:         "cart1",
+		"c1": {
 			CustomerID: "c1",
 			ProductIDs: []string{"p1", "p2"},
 		},
-		"cart2": {
-			ID:         "cart2",
+		"c2": {
 			CustomerID: "c2",
 			ProductIDs: []string{"p3"},
 		},
@@ -110,13 +108,11 @@ func NewMockDatabase() *MockDatabase {
 
 	// Add sample favorites
 	db.Favorites = map[string]models.Favorites{
-		"fav1": {
-			ID:         "fav1",
+		"c1": {
 			CustomerID: "c1",
 			ProductIDs: []string{"p1", "p3"},
 		},
-		"fav2": {
-			ID:         "fav2",
+		"c2": {
 			CustomerID: "c2",
 			ProductIDs: []string{"p2"},
 		},
@@ -250,36 +246,12 @@ func (m *MockDatabase) RemoveProductFromOrder(orderID string, productID string) 
 	return fmt.Errorf("product with ID %s not found in order %s", productID, orderID)
 }
 
-// Implement CartDB interface
-func (m *MockDatabase) CreateCart(cart models.Cart) error {
-	m.Carts[cart.ID] = cart
-	return nil
-}
-
-func (m *MockDatabase) GetCartByID(id string) (models.Cart, error) {
+func (m *MockDatabase) GetCartByUserID(id string) (models.Cart, error) {
 	cart, exists := m.Carts[id]
 	if !exists {
 		return models.Cart{}, fmt.Errorf("cart with ID %s not found", id)
 	}
 	return cart, nil
-}
-
-func (m *MockDatabase) UpdateCart(cart models.Cart) error {
-	_, exists := m.Carts[cart.ID]
-	if !exists {
-		return fmt.Errorf("cart with ID %s not found", cart.ID)
-	}
-	m.Carts[cart.ID] = cart
-	return nil
-}
-
-func (m *MockDatabase) DeleteCart(id string) error {
-	_, exists := m.Carts[id]
-	if !exists {
-		return fmt.Errorf("cart with ID %s not found", id)
-	}
-	delete(m.Carts, id)
-	return nil
 }
 
 func (m *MockDatabase) AddProductToCart(cartID string, productID string) error {
@@ -307,36 +279,12 @@ func (m *MockDatabase) RemoveProductFromCart(cartID string, productID string) er
 	return fmt.Errorf("product with ID %s not found in cart %s", productID, cartID)
 }
 
-// Implement FavoritesDB interface
-func (m *MockDatabase) CreateFavorites(favorites models.Favorites) error {
-	m.Favorites[favorites.ID] = favorites
-	return nil
-}
-
-func (m *MockDatabase) GetFavoritesByID(id string) (models.Favorites, error) {
+func (m *MockDatabase) GetFavoritesByUserID(id string) (models.Favorites, error) {
 	favorites, exists := m.Favorites[id]
 	if !exists {
 		return models.Favorites{}, fmt.Errorf("favorites with ID %s not found", id)
 	}
 	return favorites, nil
-}
-
-func (m *MockDatabase) UpdateFavorites(favorites models.Favorites) error {
-	_, exists := m.Favorites[favorites.ID]
-	if !exists {
-		return fmt.Errorf("favorites with ID %s not found", favorites.ID)
-	}
-	m.Favorites[favorites.ID] = favorites
-	return nil
-}
-
-func (m *MockDatabase) DeleteFavorites(id string) error {
-	_, exists := m.Favorites[id]
-	if !exists {
-		return fmt.Errorf("favorites with ID %s not found", id)
-	}
-	delete(m.Favorites, id)
-	return nil
 }
 
 func (m *MockDatabase) AddProductToFavorites(favoriteID string, productID string) error {

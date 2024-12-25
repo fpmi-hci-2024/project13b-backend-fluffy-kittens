@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Initialize the database (for production, use the actual database connection)
-	db, err := services.NewPostgresDatabase("postgresql://fluffy_kitten:htUtmkIjKHoQuwO6cDcbvsNsQZzXuYb7@dpg-ct7mmg56l47c73crse90-a/fluffy_db")
+	db, err := services.NewPostgresDatabase("postgresql://user:Zr7Fue6hU5pfxGnrQrbanKewCf74Dnfc@dpg-ctm0ptbqf0us738b1bq0-a/fluffy_db_ncmp")
 
 	if err != nil {
 		log.Fatal(fmt.Printf("Could not initialize db connection: %s", err))
@@ -57,20 +57,14 @@ func main() {
 	r.HandleFunc("/customers/{customerId}", customerHandler.DeleteCustomer).Methods("DELETE")
 
 	// Cart routes
-	r.HandleFunc("/carts", cartHandler.CreateCart).Methods("POST")
-	r.HandleFunc("/carts/{cartId}", cartHandler.GetCart).Methods("GET")
-	r.HandleFunc("/carts/{cartId}", cartHandler.UpdateCart).Methods("PUT")
-	r.HandleFunc("/carts/{cartId}", cartHandler.DeleteCart).Methods("DELETE")
-	r.HandleFunc("/carts/{cartId}/products/{productId}", cartHandler.AddProductToCart).Methods("POST")
-	r.HandleFunc("/carts/{cartId}/products/{productId}", cartHandler.RemoveProductFromCart).Methods("DELETE")
+	r.HandleFunc("/cart/{customerId}", cartHandler.GetCartByUserID).Methods("GET")
+	r.HandleFunc("/cart/{customerId}/products/{productId}", cartHandler.AddProductToCart).Methods("POST")
+	r.HandleFunc("/cart/{customerId}/products/{productId}", cartHandler.RemoveProductFromCart).Methods("DELETE")
 
 	// Favorites routes
-	r.HandleFunc("/favorites", favoritesHandler.CreateFavorites).Methods("POST")
-	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.GetFavoritesByID).Methods("GET")
-	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.UpdateFavorites).Methods("PUT")
-	r.HandleFunc("/favorites/{favoriteId}", favoritesHandler.DeleteFavorites).Methods("DELETE")
-	r.HandleFunc("/favorites/{favoriteId}/products/{productId}", favoritesHandler.AddProductToFavorites).Methods("POST")
-	r.HandleFunc("/favorites/{favoriteId}/products/{productId}", favoritesHandler.RemoveProductFromFavorites).Methods("DELETE")
+	r.HandleFunc("/favorites/{customerId}", favoritesHandler.GetFavoritesByUserID).Methods("GET")
+	r.HandleFunc("/favorites/{customerId}/products/{productId}", favoritesHandler.AddProductToFavorites).Methods("POST")
+	r.HandleFunc("/favorites/{customerId}/products/{productId}", favoritesHandler.RemoveProductFromFavorites).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

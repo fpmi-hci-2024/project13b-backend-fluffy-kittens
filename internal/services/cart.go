@@ -1,97 +1,59 @@
 package services
 
 import (
-	"database/sql"
 	"fluffy-shop-api/internal/models"
 	"fmt"
 )
 
-func (pdb *PostgresDatabase) CreateCart(cart models.Cart) error {
+func (pdb *PostgresDatabase) GetCartByUserID(customerID string) (models.Cart, error) {
 	query := `
-        INSERT INTO cart (id, customer_id)
-        VALUES ($1, $2)
+        SELECT product_id
+        FROM cart_products
+        WHERE customer_id = $1
     `
-	_, err := pdb.db.Exec(query, cart.ID, cart.CustomerID)
+	rows, err := pdb.db.Query(query, customerID)
 	if err != nil {
-		return fmt.Errorf("failed to create cart: %w", err)
-	}
-	return nil
-}
-
-func (pdb *PostgresDatabase) GetCartByID(id string) (models.Cart, error) {
-	query := `
-        SELECT id, customer_id
-        FROM cart
-        WHERE id = $1
-    `
-	var cart models.Cart
-	err := pdb.db.QueryRow(query, id).Scan(&cart.ID, &cart.CustomerID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return models.Cart{}, fmt.Errorf("cart with ID %s not found", id)
-		}
 		return models.Cart{}, fmt.Errorf("failed to get cart: %w", err)
 	}
-	return cart, nil
+	defer rows.Close()
+
+	var productIDs []string
+	for rows.Next() {
+		var productID string
+		if err := rows.Scan(&productID); err != nil {
+			return models.Cart{}, fmt.Errorf("failed to scan product ID: %w", err)
+		}
+		productIDs = append(productIDs, productID)
+	}
+
+	if err := rows.Err(); err != nil {
+		return models.Cart{}, fmt.Errorf("error iterating over rows: %w", err)
+	}
+
+	return models.Cart{
+		CustomerID: customerID,
+		ProductIDs: productIDs,
+	}, nil
 }
 
-func (pdb *PostgresDatabase) UpdateCart(cart models.Cart) error {
+func (pdb *PostgresDatabase) AddProductToCart(customerID string, productID string) error {
 	query := `
-        UPDATE cart
-        SET customer_id = $1
-        WHERE id = $2
-    `
-	result, err := pdb.db.Exec(query, cart.CustomerID, cart.ID)
-	if err != nil {
-		return fmt.Errorf("failed to update cart: %w", err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rowsAffected == 0 {
-		return fmt.Errorf("cart with ID %s not found", cart.ID)
-	}
-	return nil
-}
-
-func (pdb *PostgresDatabase) DeleteCart(id string) error {
-	query := `
-        DELETE FROM cart
-        WHERE id = $1
-    `
-	result, err := pdb.db.Exec(query, id)
-	if err != nil {
-		return fmt.Errorf("failed to delete cart: %w", err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rowsAffected == 0 {
-		return fmt.Errorf("cart with ID %s not found", id)
-	}
-	return nil
-}
-
-func (pdb *PostgresDatabase) AddProductToCart(cartID string, productID string) error {
-	query := `
-        INSERT INTO cart_products (cart_id, product_id)
+        INSERT INTO cart_products (customer_id, product_id)
         VALUES ($1, $2)
     `
-	_, err := pdb.db.Exec(query, cartID, productID)
+	_, err := pdb.db.Exec(query, customerID, productID)
 	if err != nil {
 		return fmt.Errorf("failed to add product to cart: %w", err)
 	}
 	return nil
 }
 
-func (pdb *PostgresDatabase) RemoveProductFromCart(cartID string, productID string) error {
+func (pdb *PostgresDatabase) RemoveProductFromCart(customerID string, productID string) error {
 	query := `
         DELETE FROM cart_products
-        WHERE cart_id = $1 AND product_id = $2
+        WHERE customer_id = $1 AND product_id = $2
     `
-	result, err := pdb.db.Exec(query, cartID, productID)
+	result, err := pdb.db.Exec(query, customerID, productID)
 	if err != nil {
 		return fmt.Errorf("failed to remove product from cart: %w", err)
 	}
@@ -100,7 +62,7 @@ func (pdb *PostgresDatabase) RemoveProductFromCart(cartID string, productID stri
 		return fmt.Errorf("failed to get rows affected: %w", err)
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("product %s not found in cart %s", productID, cartID)
+		return fmt.Errorf("product %s not found in cart for customer %s", productID, customerID)
 	}
 	return nil
 }
