@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Initialize the database (for production, use the actual database connection)
-	db, err := services.NewPostgresDatabase("postgresql://fluffy_kitten:htUtmkIjKHoQuwO6cDcbvsNsQZzXuYb7@dpg-ct7mmg56l47c73crse90-a/fluffy_db")
+	db, err := services.NewPostgresDatabase("postgresql://user:Zr7Fue6hU5pfxGnrQrbanKewCf74Dnfc@dpg-ctm0ptbqf0us738b1bq0-a/fluffy_db_ncmp")
 
 	if err != nil {
 		log.Fatal(fmt.Printf("Could not initialize db connection: %s", err))
