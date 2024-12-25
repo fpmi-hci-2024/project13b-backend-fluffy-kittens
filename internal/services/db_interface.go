@@ -33,20 +33,14 @@ type OrderDB interface {
 
 // CartDB defines database operations for Cart model
 type CartDB interface {
-	CreateCart(cart models.Cart) error
-	GetCartByID(id string) (models.Cart, error)
-	UpdateCart(cart models.Cart) error
-	DeleteCart(id string) error
-	AddProductToCart(cartID string, productID string) error
-	RemoveProductFromCart(cartID string, productID string) error
+	GetCartByUserID(customerID string) (models.Cart, error)
+	AddProductToCart(customerID string, productID string) error
+	RemoveProductFromCart(customerID string, productID string) error
 }
 
 // FavoritesDB defines database operations for Favorites model
 type FavoritesDB interface {
-	CreateFavorites(favorites models.Favorites) error
-	GetFavoritesByID(id string) (models.Favorites, error)
-	UpdateFavorites(favorites models.Favorites) error
-	DeleteFavorites(id string) error
+	GetFavoritesByUserID(id string) (models.Favorites, error)
 	AddProductToFavorites(favoriteID string, productID string) error
 	RemoveProductFromFavorites(favoriteID string, productID string) error
 }
